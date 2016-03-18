@@ -7,7 +7,7 @@ public class RCArray{
 	public static final byte CONTAINER_TYPE = ContainerType.ARRAY;
 	public short nameLength;
 	public byte[] name;
-	public int size = 1 + 2 + 4 + 1 + 4;
+	public int size = 1 + 2 + 4 + 4 + 1 + 4;
 	public byte type;
 	public int count;
 	public byte[] data;
@@ -41,17 +41,11 @@ public class RCArray{
 	}
 	
 	
-//	public void setName(String name){
-//		assert(name.length() < Short.MAX_VALUE);
-//		this.nameLength = (short)name.length();
-//		this.name = name.getBytes();
-//	}
-	
-	
 	public int getBytes(byte[] dest, int pointer){
 		pointer = writeBytes(dest, pointer, CONTAINER_TYPE);
 		pointer = writeBytes(dest, pointer, nameLength);
 		pointer = writeBytes(dest, pointer, name);
+		pointer = writeBytes(dest, pointer, size);
 		pointer = writeBytes(dest, pointer, type);
 		pointer = writeBytes(dest, pointer, count);
 		

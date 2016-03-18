@@ -13,8 +13,10 @@ public class RCObject{
 	
 	private int size = 1 + 2 + 4 + 2 + 2;
 	private short fieldCount;
-	private short arrayCount;
 	private List<RCField> fields = new ArrayList<RCField>();
+	private short stringCount;
+	private List<RCString> strings = new ArrayList<RCString>();
+	private short arrayCount;
 	private List<RCArray> arrays = new ArrayList<RCArray>();
 	
 	
@@ -42,6 +44,13 @@ public class RCObject{
 	}
 	
 	
+	public void addString(RCString string){
+		strings.add(string);
+		size += string.getSize();
+		stringCount = (short)strings.size();
+	}
+	
+	
 	public void addArray(RCArray array){
 		arrays.add(array);
 		size += array.getSize();
@@ -63,6 +72,11 @@ public class RCObject{
 		pointer = writeBytes(dest, pointer, fieldCount);
 		for(RCField field : fields){
 			pointer = field.getBytes(dest, pointer);
+		}
+		
+		pointer = writeBytes(dest, pointer, stringCount);
+		for(RCString string : strings){
+			pointer = string.getBytes(dest, pointer);
 		}
 		
 		pointer = writeBytes(dest, pointer, arrayCount);
