@@ -7,6 +7,7 @@ public class RCArray{
 	public static final byte CONTAINER_TYPE = ContainerType.ARRAY;
 	public short nameLength;
 	public byte[] name;
+	public int size = 1 + 2 + 4 + 1 + 4;
 	public byte type;
 	public int count;
 	public byte[] data;
@@ -26,9 +27,25 @@ public class RCArray{
 	
 	public void setName(String name){
 		assert(name.length() < Short.MAX_VALUE);
+		
+		if(this.name != null){ size -= this.name.length; } 
+		
 		this.nameLength = (short)name.length();
 		this.name = name.getBytes();
+		size += nameLength;
 	}
+	
+	
+	private void updateSize(){
+		size += getDataSize();
+	}
+	
+	
+//	public void setName(String name){
+//		assert(name.length() < Short.MAX_VALUE);
+//		this.nameLength = (short)name.length();
+//		this.name = name.getBytes();
+//	}
 	
 	
 	public int getBytes(byte[] dest, int pointer){
@@ -69,8 +86,7 @@ public class RCArray{
 	
 	
 	public int getSize(){
-		assert(data.length == Type.getSize(type));
-		return 1 + 2 + name.length + 1 + 4 + getDataSize();
+		return size;
 	}
 	
 	
@@ -95,6 +111,7 @@ public class RCArray{
 		array.type = Type.BYTE;
 		array.count = data.length;
 		array.data = data;
+		array.updateSize();
 		return array;
 	}
 	
@@ -105,6 +122,7 @@ public class RCArray{
 		array.type = Type.CHAR;
 		array.count = data.length;
 		array.charData = data;
+		array.updateSize();
 		return array;
 	}
 	
@@ -115,6 +133,7 @@ public class RCArray{
 		array.type = Type.SHORT;
 		array.count = data.length;
 		array.shortData = data;
+		array.updateSize();
 		return array;
 	}
 	
@@ -125,6 +144,7 @@ public class RCArray{
 		array.type = Type.INT;
 		array.count = data.length;
 		array.intData = data;
+		array.updateSize();
 		return array;
 	}
 	
@@ -135,6 +155,7 @@ public class RCArray{
 		array.type = Type.LONG;
 		array.count = data.length;
 		array.longData = data;
+		array.updateSize();
 		return array;
 	}
 	
@@ -145,6 +166,7 @@ public class RCArray{
 		array.type = Type.FLOAT;
 		array.count = data.length;
 		array.floatData = data;
+		array.updateSize();
 		return array;
 	}
 	
@@ -155,6 +177,7 @@ public class RCArray{
 		array.type = Type.DOUBLE;
 		array.count = data.length;
 		array.doubleData = data;
+		array.updateSize();
 		return array;
 	}
 	
@@ -165,6 +188,7 @@ public class RCArray{
 		array.type = Type.BOOLEAN;
 		array.count = data.length;
 		array.booleanData = data;
+		array.updateSize();
 		return array;
 	}
 }

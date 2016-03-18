@@ -5,21 +5,19 @@ import static com.swiftrunner.raincloud.serialization.SerializationWriter.writeB
 import java.util.ArrayList;
 import java.util.List;
 
-public class RCObject{
+public class RCDatabase{
 	
-	public static final byte CONTAINER_TYPE = ContainerType.OBJECT;
+	public static final byte[] HEADER = "RCDB".getBytes(); 
+	public static final byte CONTAINER_TYPE = ContainerType.DATABASE;
 	public short nameLength;
 	public byte[] name;
 	
-	private int size = 1 + 2 + 4 + 2 + 2;
-	private short fieldCount;
-	private short arrayCount;
-	private List<RCField> fields = new ArrayList<RCField>();
-	private List<RCArray> arrays = new ArrayList<RCArray>();
+	private int size = HEADER.length + 1 + 2 + 4 + 2;
+	private short objectCount;
+	private List<RCObject> objects = new ArrayList<RCObject>();
 	
 	
-	
-	public RCObject(String name){
+	public RCDatabase(String name){
 		setName(name);
 	}
 	
@@ -35,17 +33,10 @@ public class RCObject{
 	}
 	
 	
-	public void addField(RCField field){
-		fields.add(field);
-		size += field.getSize();
-		fieldCount = (short)fields.size();
-	}
-	
-	
-	public void addArray(RCArray array){
-		arrays.add(array);
-		size += array.getSize();
-		arrayCount = (short)arrays.size();
+	public void addObject(RCObject object){
+		objects.add(object);
+		size += object.getSize();
+		objectCount = (short)objects.size();
 	}
 	
 	
@@ -55,19 +46,15 @@ public class RCObject{
 
 
 	public int getBytes(byte[] dest, int pointer){
+		pointer = writeBytes(dest, pointer, HEADER);
 		pointer = writeBytes(dest, pointer, CONTAINER_TYPE);
 		pointer = writeBytes(dest, pointer, nameLength);
 		pointer = writeBytes(dest, pointer, name);
 		pointer = writeBytes(dest, pointer, size);
 		
-		pointer = writeBytes(dest, pointer, fieldCount);
-		for(RCField field : fields){
-			pointer = field.getBytes(dest, pointer);
-		}
-		
-		pointer = writeBytes(dest, pointer, arrayCount);
-		for(RCArray array: arrays){
-			pointer = array.getBytes(dest, pointer);
+		pointer = writeBytes(dest, pointer, objectCount);
+		for(RCObject object: objects){
+			pointer = object.getBytes(dest, pointer);
 		}
 		return pointer;
     }
