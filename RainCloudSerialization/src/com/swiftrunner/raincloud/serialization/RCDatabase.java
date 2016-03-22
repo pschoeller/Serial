@@ -1,7 +1,9 @@
 package com.swiftrunner.raincloud.serialization;
 
-import static com.swiftrunner.raincloud.serialization.SerializationWriter.writeBytes;
+import static com.swiftrunner.raincloud.serialization.SerializationWriter.*;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,10 +13,12 @@ public class RCDatabase{
 	public static final byte CONTAINER_TYPE = ContainerType.DATABASE;
 	public short nameLength;
 	public byte[] name;
-	
 	private int size = HEADER.length + 1 + 2 + 4 + 2;
 	private short objectCount;
 	private List<RCObject> objects = new ArrayList<RCObject>();
+	
+	
+	private RCDatabase(){}
 	
 	
 	public RCDatabase(String name){
@@ -30,6 +34,11 @@ public class RCDatabase{
 		this.nameLength = (short)name.length();
 		this.name = name.getBytes();
 		size += nameLength;
+	}
+	
+	
+	public String getName(){
+		return new String(name, 0, nameLength);
 	}
 	
 	
@@ -57,5 +66,46 @@ public class RCDatabase{
 			pointer = object.getBytes(dest, pointer);
 		}
 		return pointer;
+    }
+	
+	
+	public static RCDatabase Deserialize(byte[] data){
+		int pointer = 0;
+		assert(readString(data, pointer, HEADER.length).equals(HEADER));
+		pointer += HEADER.length;
+		
+		byte containerType = readbyte(data, pointer++);
+		assert(containerType == CONTAINER_TYPE);
+		
+		RCDatabase result = new RCDatabase();
+		
+		result.nameLength = readShort(data, pointer);
+		pointer += 2;
+		
+		result.name = readString(data, pointer, result.nameLength).getBytes();
+		pointer += result.nameLength;
+		
+		result.size = readInt(data, pointer);
+		pointer += 4;
+		
+		result.objectCount = readShort(data, pointer);
+		pointer += 2;
+		
+		
+	    return result;
+    }
+
+
+	public static RCDatabase DeserializeFromFile(String path){
+		byte[] buffer = null;
+		try{
+	        BufferedInputStream stream = new BufferedInputStream(new FileInputStream(path));
+	        buffer = new byte[stream.available()];
+	        stream.read(buffer);
+	        stream.close();
+        } catch(Exception e){
+	        e.printStackTrace();
+        }
+	    return Deserialize(buffer);
     }
 }

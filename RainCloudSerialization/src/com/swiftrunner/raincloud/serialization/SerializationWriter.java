@@ -1,5 +1,7 @@
 package com.swiftrunner.raincloud.serialization;
 
+import java.nio.ByteBuffer;
+
 public class SerializationWriter{
 	
 	public static final byte[]	HEADER	= "RC".getBytes();
@@ -152,7 +154,8 @@ public class SerializationWriter{
 	
 	
 	public static int readInt(byte[] src, int pointer){
-		return (int) ((src[pointer] << 24) | (src[pointer + 1] << 16) | (src[pointer + 2] << 8) | (src[pointer + 3]));
+		return ByteBuffer.wrap(src, pointer, 4).getInt();
+//		return (int) ((src[pointer] << 24) | (src[pointer + 1] << 16) | (src[pointer + 2] << 8) | (src[pointer + 3]));
 	}
 	
 	
@@ -175,5 +178,10 @@ public class SerializationWriter{
 	public static boolean readBoolean(byte[] src, int pointer){
 		assert(src[pointer] == 0 || src[pointer] == 1);
 		return src[pointer] != 0;
+	}
+	
+	
+	public static String readString(byte[] src, int pointer, int length){
+		return new String(src, pointer, length);
 	}
 }

@@ -11,7 +11,7 @@ public class RCObject{
 	public short nameLength;
 	public byte[] name;
 	
-	private int size = 1 + 2 + 4 + 2 + 2;
+	private int size = 1 + 2 + 4 + 2 + 2 + 2;
 	private short fieldCount;
 	private List<RCField> fields = new ArrayList<RCField>();
 	private short stringCount;
