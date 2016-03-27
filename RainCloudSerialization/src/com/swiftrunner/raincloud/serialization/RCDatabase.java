@@ -13,9 +13,9 @@ public class RCDatabase{
 	public static final byte CONTAINER_TYPE = ContainerType.DATABASE;
 	public short nameLength;
 	public byte[] name;
-	private int size = HEADER.length + 1 + 2 + 4 + 2;
-	private short objectCount;
-	private List<RCObject> objects = new ArrayList<RCObject>();
+	public int size = HEADER.length + 1 + 2 + 4 + 2;
+	public short objectCount;
+	public List<RCObject> objects = new ArrayList<RCObject>();
 	
 	
 	private RCDatabase(){}
@@ -74,7 +74,7 @@ public class RCDatabase{
 		assert(readString(data, pointer, HEADER.length).equals(HEADER));
 		pointer += HEADER.length;
 		
-		byte containerType = readbyte(data, pointer++);
+		byte containerType = readByte(data, pointer++);
 		assert(containerType == CONTAINER_TYPE);
 		
 		RCDatabase result = new RCDatabase();
@@ -91,6 +91,11 @@ public class RCDatabase{
 		result.objectCount = readShort(data, pointer);
 		pointer += 2;
 		
+		for(int i=0; i<result.objectCount; i++){
+			RCObject object = RCObject.Deserialize(data, pointer);
+			result.objects.add(object);
+			pointer += object.getSize();
+		}
 		
 	    return result;
     }

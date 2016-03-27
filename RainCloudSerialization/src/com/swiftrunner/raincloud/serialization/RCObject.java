@@ -1,6 +1,6 @@
 package com.swiftrunner.raincloud.serialization;
 
-import static com.swiftrunner.raincloud.serialization.SerializationWriter.writeBytes;
+import static com.swiftrunner.raincloud.serialization.SerializationWriter.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,12 +13,16 @@ public class RCObject{
 	
 	private int size = 1 + 2 + 4 + 2 + 2 + 2;
 	private short fieldCount;
-	private List<RCField> fields = new ArrayList<RCField>();
+	public List<RCField> fields = new ArrayList<RCField>();
 	private short stringCount;
-	private List<RCString> strings = new ArrayList<RCString>();
+	public List<RCString> strings = new ArrayList<RCString>();
 	private short arrayCount;
-	private List<RCArray> arrays = new ArrayList<RCArray>();
+	public List<RCArray> arrays = new ArrayList<RCArray>();
 	
+	private static final int sizeOffset = 1 + 2 + 0 + 4;
+	
+	
+	private RCObject(){}
 	
 	
 	public RCObject(String name){
@@ -34,6 +38,11 @@ public class RCObject{
 		this.nameLength = (short)name.length();
 		this.name = name.getBytes();
 		size += nameLength;
+	}
+	
+	
+	public String getName(){
+		return new String(name, 0, nameLength);
 	}
 	
 	
@@ -85,4 +94,50 @@ public class RCObject{
 		}
 		return pointer;
     }
+	
+	
+	public static RCObject Deserialize(byte[] data, int pointer){
+		byte containerType = data[pointer++];
+		assert(containerType == CONTAINER_TYPE);
+		
+		RCObject result = new RCObject();
+		
+		result.nameLength = readShort(data, pointer);
+		pointer += 2;
+		
+		result.name = readString(data, pointer, result.nameLength).getBytes();
+		pointer += result.nameLength;
+		
+		result.size = readInt(data, pointer);
+		pointer += 4;
+		
+//		pointer += result.size - sizeOffset - result.nameLength;
+//		if(true) return result;
+		
+		result.fieldCount = readShort(data, pointer);
+		pointer += 2;
+		for(int i = 0; i < result.fieldCount; i++){
+			RCField field = RCField.Deserialize(data, pointer);
+			result.fields.add(field);
+			pointer += field.getSize();
+		}
+		
+		result.stringCount = readShort(data, pointer);
+		pointer += 2;
+		for(int i = 0; i < result.stringCount; i++){
+			RCString string = RCString.Deserialize(data, pointer);
+			result.strings.add(string);
+			pointer += string.getSize();
+		}
+		
+		result.arrayCount = readShort(data, pointer);
+		pointer += 2;
+		for(int i = 0; i < result.arrayCount; i++){
+			RCArray array = RCArray.Deserialize(data, pointer);
+			result.arrays.add(array);
+			pointer += array.getSize();
+		}
+		
+		return result;
+	}
 }

@@ -1,6 +1,7 @@
 package com.swiftrunner.raincloud.serialization;
 
-import static com.swiftrunner.raincloud.serialization.SerializationWriter.writeBytes;
+import static com.swiftrunner.raincloud.serialization.SerializationWriter.*;
+
 
 public class RCString{
 	
@@ -26,6 +27,11 @@ public class RCString{
 	}
 	
 	
+	public String getName(){
+		return new String(name, 0, nameLength);
+	}
+	
+	
 	private void updateSize(){
 		size += getDataSize();
 	}
@@ -47,6 +53,11 @@ public class RCString{
 	}
 	
 	
+	public String getString(){
+		return new String(characters);
+	}
+	
+	
 	public int getDataSize(){
 		return characters.length * Type.getSize(Type.CHAR);
 	}
@@ -59,5 +70,30 @@ public class RCString{
 		string.characters = data.toCharArray();
 		string.updateSize();
 		return string;
+	}
+	
+	
+	public static RCString Deserialize(byte[] data, int pointer){
+		byte containerType = data[pointer++];
+		assert(containerType == CONTAINER_TYPE);
+		
+		RCString result = new RCString();
+		
+		result.nameLength = readShort(data, pointer);
+		pointer += 2;
+		
+		result.name = readString(data, pointer, result.nameLength).getBytes();
+		pointer += result.nameLength;
+		
+		result.size = readInt(data, pointer);
+		pointer += 4;
+		
+		result.count = readInt(data, pointer);
+		pointer += 4;
+		
+		result.characters = new char[result.count];
+		readChars(data, pointer, result.characters);
+		pointer += result.count * Type.getSize(Type.CHAR);
+		return result;
 	}
 }

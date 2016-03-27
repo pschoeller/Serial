@@ -21,6 +21,11 @@ public class RCField{
 	}
 	
 	
+	public String getName(){
+		return new String(name, 0, nameLength);
+	}
+	
+	
 	public int getBytes(byte[] dest, int pointer){
 		pointer = writeBytes(dest, pointer, CONTAINER_TYPE);
 		pointer = writeBytes(dest, pointer, nameLength);
@@ -114,5 +119,25 @@ public class RCField{
 		field.data = new byte[Type.getSize(Type.BOOLEAN)];
 		writeBytes(field.data, 0, value);
 		return field;
+	}
+	
+	
+	public static RCField Deserialize(byte[] data, int pointer){
+		byte containerType = data[pointer++];
+		assert(containerType == CONTAINER_TYPE);
+		
+		RCField result = new RCField();
+		
+		result.nameLength = readShort(data, pointer);
+		pointer += 2;
+		
+		result.name = readString(data, pointer, result.nameLength).getBytes();
+		pointer += result.nameLength;
+		
+		result.type = data[pointer++];
+		result.data = new byte[Type.getSize(result.type)];
+		readBytes(data, pointer, result.data);
+		pointer += Type.getSize(result.type);
+		return result;
 	}
 }

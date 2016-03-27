@@ -1,13 +1,14 @@
 package com.swiftrunner.raincloud.serialization;
 
-import static com.swiftrunner.raincloud.serialization.SerializationWriter.writeBytes;
+import static com.swiftrunner.raincloud.serialization.SerializationWriter.*;
+
 
 public class RCArray{
 	
 	public static final byte CONTAINER_TYPE = ContainerType.ARRAY;
 	public short nameLength;
 	public byte[] name;
-	public int size = 1 + 2 + 4 + 4 + 1 + 4;
+	public int size = 1 + 2 + 4 + 1 + 4;
 	public byte type;
 	public int count;
 	public byte[] data;
@@ -33,6 +34,11 @@ public class RCArray{
 		this.nameLength = (short)name.length();
 		this.name = name.getBytes();
 		size += nameLength;
+	}
+	
+	
+	public String getName(){
+		return new String(name, 0, nameLength);
 	}
 	
 	
@@ -184,5 +190,65 @@ public class RCArray{
 		array.booleanData = data;
 		array.updateSize();
 		return array;
+	}
+	
+	
+	public static RCArray Deserialize(byte[] data, int pointer){
+		byte containerType = data[pointer++];
+		assert(containerType == CONTAINER_TYPE);
+		
+		RCArray result = new RCArray();
+		
+		result.nameLength = readShort(data, pointer);
+		pointer += 2;
+		
+		result.name = readString(data, pointer, result.nameLength).getBytes();
+		pointer += result.nameLength;
+		
+		result.size = readInt(data, pointer);
+		pointer += 4;
+		
+		result.type = data[pointer++];
+		
+		result.count = readInt(data, pointer);
+		pointer += 4;
+		
+		switch(result.type){
+			case Type.BYTE:
+				result.data = new byte[result.count];
+				readBytes(data, pointer, result.data);
+				break;
+			case Type.SHORT:
+				result.shortData = new short[result.count];
+				readShorts(data, pointer, result.shortData);
+				break;
+			case Type.CHAR:
+				result.charData = new char[result.count];
+				readChars(data, pointer, result.charData);
+				break;
+			case Type.INT:
+				result.intData = new int[result.count];
+				readInts(data, pointer, result.intData);
+				break;
+			case Type.LONG:
+				result.longData = new long[result.count];
+				readLongs(data, pointer, result.longData);
+				break;
+			case Type.FLOAT:
+				result.floatData = new float[result.count];
+				readFloats(data, pointer, result.floatData);
+				break;
+			case Type.DOUBLE:
+				result.doubleData = new double[result.count];
+				readDoubles(data, pointer, result.doubleData);
+				break;
+			case Type.BOOLEAN:
+				result.booleanData = new boolean[result.count];
+				readBooleans(data, pointer, result.booleanData);
+				break;
+		}
+		
+		pointer += result.count * Type.getSize(result.type);
+		return result;
 	}
 }
