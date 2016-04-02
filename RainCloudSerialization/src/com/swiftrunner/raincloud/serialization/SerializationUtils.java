@@ -2,11 +2,7 @@ package com.swiftrunner.raincloud.serialization;
 
 import java.nio.ByteBuffer;
 
-public class SerializationWriter{
-	
-	public static final byte[]	HEADER	= "RC".getBytes();
-	public static final short	VERSION	= 0x0100;
-	
+public class SerializationUtils{
 	
 	public static int writeBytes(byte[] dest, int pointer, byte[] src){
 		assert(dest.length > pointer + src.length);
@@ -151,7 +147,7 @@ public class SerializationWriter{
 	
 	
 	public static char readChar(byte[] src, int pointer){
-		return (char) ((src[pointer] << 8) | (src[pointer + 1]));
+		return ByteBuffer.wrap(src, pointer, 2).getChar();
 	}
 	
 	
@@ -164,8 +160,7 @@ public class SerializationWriter{
 	
 	
 	public static short readShort(byte[] src, int pointer){
-//		return ByteBuffer.wrap(src, pointer, 2).geShort();
-		return (short) ((src[pointer] << 8) | (src[pointer + 1]));
+		return ByteBuffer.wrap(src, pointer, 2).getShort();
 	}
 	
 	
@@ -179,7 +174,6 @@ public class SerializationWriter{
 	
 	public static int readInt(byte[] src, int pointer){
 		return ByteBuffer.wrap(src, pointer, 4).getInt();
-//		return (int) ((src[pointer] << 24) | (src[pointer + 1] << 16) | (src[pointer + 2] << 8) | (src[pointer + 3]));
 	}
 	
 	
@@ -192,8 +186,7 @@ public class SerializationWriter{
 	
 	
 	public static long readLong(byte[] src, int pointer){
-		return (long) 	((src[pointer] << 56) | (src[pointer + 1] << 48) | (src[pointer + 2] << 40) | (src[pointer + 3] << 32) | 
-						(src[pointer + 4] << 24) | (src[pointer + 5] << 16) | (src[pointer + 6] << 8) | (src[pointer + 7]));
+		return ByteBuffer.wrap(src, pointer, 8).getLong();
 	}
 	
 	

@@ -1,14 +1,11 @@
 package com.swiftrunner.raincloud.serialization;
 
-import static com.swiftrunner.raincloud.serialization.SerializationWriter.*;
+import static com.swiftrunner.raincloud.serialization.SerializationUtils.*;
 
 
-public class RCArray{
+public class RCArray extends RCBase{
 	
 	public static final byte CONTAINER_TYPE = ContainerType.ARRAY;
-	public short nameLength;
-	public byte[] name;
-	public int size = 1 + 2 + 4 + 1 + 4;
 	public byte type;
 	public int count;
 	public byte[] data;
@@ -23,22 +20,8 @@ public class RCArray{
 	private boolean[] booleanData;
 	
 	
-	private RCArray(){}
-	
-	
-	public void setName(String name){
-		assert(name.length() < Short.MAX_VALUE);
-		
-		if(this.name != null){ size -= this.name.length; } 
-		
-		this.nameLength = (short)name.length();
-		this.name = name.getBytes();
-		size += nameLength;
-	}
-	
-	
-	public String getName(){
-		return new String(name, 0, nameLength);
+	private RCArray(){
+		size += 1 + 1 + 4;
 	}
 	
 	

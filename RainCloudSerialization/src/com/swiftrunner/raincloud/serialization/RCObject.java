@@ -1,17 +1,13 @@
 package com.swiftrunner.raincloud.serialization;
 
-import static com.swiftrunner.raincloud.serialization.SerializationWriter.*;
+import static com.swiftrunner.raincloud.serialization.SerializationUtils.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class RCObject{
+public class RCObject extends RCBase{
 	
 	public static final byte CONTAINER_TYPE = ContainerType.OBJECT;
-	public short nameLength;
-	public byte[] name;
-	
-	private int size = 1 + 2 + 4 + 2 + 2 + 2;
 	private short fieldCount;
 	public List<RCField> fields = new ArrayList<RCField>();
 	private short stringCount;
@@ -19,30 +15,13 @@ public class RCObject{
 	private short arrayCount;
 	public List<RCArray> arrays = new ArrayList<RCArray>();
 	
-	private static final int sizeOffset = 1 + 2 + 0 + 4;
-	
 	
 	private RCObject(){}
 	
 	
 	public RCObject(String name){
+		size += 1 + 2 + 2 + 2;
 		setName(name);
-	}
-	
-	
-	public void setName(String name){
-		assert(name.length() < Short.MAX_VALUE);
-		
-		if(this.name != null){ size -= this.name.length; } 
-		
-		this.nameLength = (short)name.length();
-		this.name = name.getBytes();
-		size += nameLength;
-	}
-	
-	
-	public String getName(){
-		return new String(name, 0, nameLength);
 	}
 	
 	
@@ -69,6 +48,36 @@ public class RCObject{
 	
 	public int getSize(){
 		return size;
+	}
+	
+	
+	public RCField findField(String name){
+		for(RCField field : fields){
+			if(field.getName().equals(name)){
+				return field;
+			}
+		}
+		return null;
+	}
+	
+	
+	public RCString findString(String name){
+		for(RCString string : strings){
+			if(string.getName().equals(name)){
+				return string;
+			}
+		}
+		return null;
+	}
+	
+	
+	public RCArray findArray(String name){
+		for(RCArray array : arrays){
+			if(array.getName().equals(name)){
+				return array;
+			}
+		}
+		return null;
 	}
 
 

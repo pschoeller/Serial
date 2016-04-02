@@ -1,12 +1,20 @@
 package com.swiftrunner.raincloud.serialization;
 
-import static com.swiftrunner.raincloud.serialization.SerializationWriter.*;
+import static com.swiftrunner.raincloud.serialization.SerializationUtils.readBoolean;
+import static com.swiftrunner.raincloud.serialization.SerializationUtils.readByte;
+import static com.swiftrunner.raincloud.serialization.SerializationUtils.readBytes;
+import static com.swiftrunner.raincloud.serialization.SerializationUtils.readChar;
+import static com.swiftrunner.raincloud.serialization.SerializationUtils.readDouble;
+import static com.swiftrunner.raincloud.serialization.SerializationUtils.readFloat;
+import static com.swiftrunner.raincloud.serialization.SerializationUtils.readInt;
+import static com.swiftrunner.raincloud.serialization.SerializationUtils.readLong;
+import static com.swiftrunner.raincloud.serialization.SerializationUtils.readShort;
+import static com.swiftrunner.raincloud.serialization.SerializationUtils.readString;
+import static com.swiftrunner.raincloud.serialization.SerializationUtils.writeBytes;
 
-public class RCField{
+public class RCField extends RCBase{
 	
 	public static final byte CONTAINER_TYPE = ContainerType.FIELD;
-	public short nameLength;
-	public byte[] name;
 	public byte type;
 	public byte[] data;
 	
@@ -14,16 +22,14 @@ public class RCField{
 	private RCField(){}
 	
 	
-	public void setName(String name){
-		assert(name.length() < Short.MAX_VALUE);
-		this.nameLength = (short)name.length();
-		this.name = name.getBytes();
-	}
-	
-	
-	public String getName(){
-		return new String(name, 0, nameLength);
-	}
+	public byte getByte()		{ return readByte(data, 0); }
+	public short getShort()		{ return readShort(data, 0); }
+	public char getChar()		{ return readChar(data, 0); }
+	public int getInt()			{ return readInt(data, 0); }
+	public long getLong()		{ return readLong(data, 0); }
+	public float getFloat()		{ return readFloat(data, 0); }
+	public double getDouble()	{ return readDouble(data, 0); }
+	public boolean getBoolean()	{ return readBoolean(data, 0); }
 	
 	
 	public int getBytes(byte[] dest, int pointer){
