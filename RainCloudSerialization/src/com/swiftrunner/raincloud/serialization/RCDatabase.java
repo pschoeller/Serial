@@ -111,7 +111,7 @@ public class RCDatabase extends RCBase{
 	        stream.read(buffer);
 	        stream.close();
         } catch(Exception e){
-	        e.printStackTrace();
+	        return null;
         }
 	    return Deserialize(buffer);
     }
